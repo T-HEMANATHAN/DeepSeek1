@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .chat-container {
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        .chat-input button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin-left: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Chatbot</div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="chatinput">
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('userinput').value;
+            const responseDiv = document.getElementById('response');
+            if (!input){
+                responseDiv.innerHTML = 'Type a message.';
+                return;
+            }
+            responseDiv.innerHTML = 'Loading...';
+        }    
+    
+        try 
+        {
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: 'POST',
+                headers: {
+                Authorization: 'Bearer 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',
+                "HTTP-Referer": '<YOUR_SITE_URL>', 
+                "X-Title": '<YOUR_SITE_NAME>', 
+                "Content-Type": 'application/json',
+                },
+                body: JSON.stringify({
+                    model: 'deepseek/deepseek-r1:free',
+                    messages: [{ role: 'user', content: input }],
+             }),
+            });
+            const data = await response.json();
+            console.log(data);
+            const markdownText = 
+            data.choice?.[0]?.message?.content || 'No response received.';
+            responsediv.innerHTML = marked.parse(markdownText);
+        }catch (error){
+            responseDiv.innerHTML = 'Error: ' + error.message;
+        }
+    
+    </script>
+</body>
+</html>
